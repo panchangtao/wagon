@@ -5,6 +5,7 @@
 package wasm_test
 
 import (
+	"fmt"
 	"bytes"
 	"io/ioutil"
 	"path/filepath"
@@ -21,6 +22,7 @@ func TestReadModule(t *testing.T) {
 	for _, fname := range fnames {
 		name := fname
 		t.Run(filepath.Base(name), func(t *testing.T) {
+			fmt.Println(name)
 			raw, err := ioutil.ReadFile(name)
 			if err != nil {
 				t.Fatal(err)

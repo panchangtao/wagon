@@ -97,74 +97,88 @@ func (module *Module) resolveImports(resolve ResolveFunc) error {
 
 	var funcs uint32
 	for _, importEntry := range module.Import.Entries {
-		importedModule, ok := modules[importEntry.ModuleName]
-		if !ok {
-			var err error
-			importedModule, err = resolve(importEntry.ModuleName)
-			if err != nil {
-				return err
+		if importEntry.ModuleName == "env" {
+			fmt.Println("Module Name:", importEntry.ModuleName, "- Filed Name:", importEntry.FieldName)
+			if importEntry.Kind == ExternalFunction {
+				//get the function type
+				funcType := module.Types.Entries[importEntry.Type.(FuncImport).Type]
+				var code []byte
+				code = append(code, 0x41)
+				code = append(code, 0x0b)
+				fn := &Function{IsEnv: true, Name: importEntry.FieldName, Sig: &FunctionSig{ParamTypes: funcType.ParamTypes, ReturnTypes: funcType.ReturnTypes}, Body: &FunctionBody{Code:code}}
+				module.FunctionIndexSpace = append(module.FunctionIndexSpace, *fn)
+				module.Code.Bodies = append(module.Code.Bodies, *fn.Body)
+				module.imports.Funcs = append(module.imports.Funcs, funcs)
+				funcs++
+			}
+		} else {
+			importedModule, ok := modules[importEntry.ModuleName]
+			if !ok {
+				var err error
+				importedModule, err = resolve(importEntry.ModuleName)
+				if err != nil {
+					return err
+				}
+				modules[importEntry.ModuleName] = importedModule
+			}
+			if importedModule.Export == nil {
+				return ErrNoExportsInImportedModule
 			}
 
-			modules[importEntry.ModuleName] = importedModule
-		}
-
-		if importedModule.Export == nil {
-			return ErrNoExportsInImportedModule
-		}
-
-		exportEntry, ok := importedModule.Export.Entries[importEntry.FieldName]
-		if !ok {
-			return ExportNotFoundError{importEntry.ModuleName, importEntry.FieldName}
-		}
-
-		if exportEntry.Kind != importEntry.Kind {
-			return KindMismatchError{
-				FieldName:  importEntry.FieldName,
-				ModuleName: importEntry.ModuleName,
-				Import:     importEntry.Kind,
-				Export:     exportEntry.Kind,
+			exportEntry, ok := importedModule.Export.Entries[importEntry.FieldName]
+			if !ok {
+				return ExportNotFoundError{importEntry.ModuleName, importEntry.FieldName}
 			}
-		}
 
-		index := exportEntry.Index
+			if exportEntry.Kind != importEntry.Kind {
+				return KindMismatchError{
+					FieldName:  importEntry.FieldName,
+					ModuleName: importEntry.ModuleName,
+					Import:     importEntry.Kind,
+					Export:     exportEntry.Kind,
+				}
+			}
 
-		switch exportEntry.Kind {
-		case ExternalFunction:
-			fn := importedModule.GetFunction(int(index))
-			if fn == nil {
-				return InvalidFunctionIndexError(index)
-			}
-			module.FunctionIndexSpace = append(module.FunctionIndexSpace, *fn)
-			module.Code.Bodies = append(module.Code.Bodies, *fn.Body)
-			module.imports.Funcs = append(module.imports.Funcs, funcs)
-			funcs++
-		case ExternalGlobal:
-			glb := importedModule.GetGlobal(int(index))
-			if glb == nil {
-				return InvalidGlobalIndexError(index)
-			}
-			if glb.Type.Mutable {
-				return ErrImportMutGlobal
-			}
-			module.GlobalIndexSpace = append(module.GlobalIndexSpace, *glb)
-			module.imports.Globals++
+			index := exportEntry.Index
 
-			// In both cases below, index should be always 0 (according to the MVP)
-			// We check it against the length of the index space anyway.
-		case ExternalTable:
-			if int(index) >= len(importedModule.TableIndexSpace) {
-				return InvalidTableIndexError(index)
+			switch exportEntry.Kind {
+			case ExternalFunction:
+				fn := importedModule.GetFunction(int(index))
+				if fn == nil {
+					return InvalidFunctionIndexError(index)
+				}
+				module.FunctionIndexSpace = append(module.FunctionIndexSpace, *fn)
+				module.Code.Bodies = append(module.Code.Bodies, *fn.Body)
+				module.imports.Funcs = append(module.imports.Funcs, funcs)
+				funcs++
+			case ExternalGlobal:
+				glb := importedModule.GetGlobal(int(index))
+				if glb == nil {
+					return InvalidGlobalIndexError(index)
+				}
+				if glb.Type.Mutable {
+					return ErrImportMutGlobal
+				}
+				module.GlobalIndexSpace = append(module.GlobalIndexSpace, *glb)
+				module.imports.Globals++
+
+				// In both cases below, index should be always 0 (according to the MVP)
+				// We check it against the length of the index space anyway.
+			case ExternalTable:
+				if int(index) >= len(importedModule.TableIndexSpace) {
+					return InvalidTableIndexError(index)
+				}
+				module.TableIndexSpace[0] = importedModule.TableIndexSpace[0]
+				module.imports.Tables++
+			case ExternalMemory:
+				if int(index) >= len(importedModule.LinearMemoryIndexSpace) {
+					return InvalidLinearMemoryIndexError(index)
+				}
+				module.LinearMemoryIndexSpace[0] = importedModule.LinearMemoryIndexSpace[0]
+				module.imports.Memories++
+			default:
+				return InvalidExternalError(exportEntry.Kind)
 			}
-			module.TableIndexSpace[0] = importedModule.TableIndexSpace[0]
-			module.imports.Tables++
-		case ExternalMemory:
-			if int(index) >= len(importedModule.LinearMemoryIndexSpace) {
-				return InvalidLinearMemoryIndexError(index)
-			}
-			module.LinearMemoryIndexSpace[0] = importedModule.LinearMemoryIndexSpace[0]
-			module.imports.Memories++
-		default:
-			return InvalidExternalError(exportEntry.Kind)
 		}
 	}
 	return nil

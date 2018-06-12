@@ -127,6 +127,8 @@ func NewVM(module *wasm.Module) (*VM, error) {
 			totalLocalVars: totalLocalVars,
 			args:           len(fn.Sig.ParamTypes),
 			returns:        len(fn.Sig.ReturnTypes) != 0,
+			IsEnv:          fn.IsEnv,
+			Name:           fn.Name,
 		}
 	}
 
@@ -388,11 +390,13 @@ outer:
 			vm.ctx.stack = vm.ctx.stack[:len(vm.ctx.stack)-int(place)]
 			vm.pushUint64(top)
 		default:
+			fmt.Printf("Execte Code:0x%02x\n", op)
 			vm.funcTable[op]()
 		}
 	}
 
 	if compiled.returns {
+		fmt.Println("len(vm.ctx.stack):", len(vm.ctx.stack))
 		return vm.ctx.stack[len(vm.ctx.stack)-1]
 	}
 	return 0

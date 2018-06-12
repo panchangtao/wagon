@@ -4,7 +4,10 @@
 
 package exec
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+)
 
 var (
 	// ErrSignatureMismatch is the error value used while trapping the VM when
@@ -19,7 +22,17 @@ var (
 
 func (vm *VM) call() {
 	index := vm.fetchUint32()
-
+	fun, ok := vm.funcs[index].(compiledFunction)
+	if ok {
+		if fun.IsEnv {
+			if fun.Name == "Println" {
+				fmt.Println("Println Call log aba")
+				vm.popUint64()
+				vm.pushUint64(0)
+				return
+			}
+		}
+	}
 	vm.funcs[index].call(vm, int64(index))
 }
 
