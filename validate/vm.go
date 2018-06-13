@@ -1,4 +1,4 @@
-// Copyright 2017 The go-interpreter Authors.  All rights reserved.
+// Copyright 2017 The panchangtao Authors.  All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -9,9 +9,9 @@ import (
 	"encoding/binary"
 	"io"
 
-	"github.com/go-interpreter/wagon/wasm"
-	"github.com/go-interpreter/wagon/wasm/leb128"
-	ops "github.com/go-interpreter/wagon/wasm/operators"
+	"github.com/panchangtao/wagon/wasm"
+	"github.com/panchangtao/wagon/wasm/leb128"
+	ops "github.com/panchangtao/wagon/wasm/operators"
 )
 
 // mockVM is a minimal implementation of a virtual machine to

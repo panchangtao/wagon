@@ -1,4 +1,4 @@
-// Copyright 2018 The go-interpreter Authors.  All rights reserved.
+// Copyright 2018 The panchangtao Authors.  All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -9,7 +9,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/go-interpreter/wagon/wasm"
+	"github.com/panchangtao/wagon/wasm"
 )
 
 func TestHostCall(t *testing.T) {

@@ -1,8 +1,8 @@
 wagon
 =====
 
-[![Build Status](https://travis-ci.org/go-interpreter/wagon.svg?branch=master)](https://travis-ci.org/go-interpreter/wagon)
-[![GoDoc](https://godoc.org/github.com/go-interpreter/wagon?status.svg)](https://godoc.org/github.com/go-interpreter/wagon)
+[![Build Status](https://travis-ci.org/panchangtao/wagon.svg?branch=master)](https://travis-ci.org/panchangtao/wagon)
+[![GoDoc](https://godoc.org/github.com/panchangtao/wagon?status.svg)](https://godoc.org/github.com/panchangtao/wagon)
 
 `wagon` is a [WebAssembly](http://webassembly.org)-based interpreter in [Go](https://golang.org), for [Go](https://golang.org).
 
@@ -24,4 +24,4 @@ The primary goal of `wagon` is to provide the building blocks to be able to buil
 
 ## Contributing
 
-See the [CONTRIBUTING](https://github.com/go-interpreter/license/blob/master/CONTRIBUTE.md) guide for pointers on how to contribute to `go-interpreter` and `wagon`.
+See the [CONTRIBUTING](https://github.com/panchangtao/license/blob/master/CONTRIBUTE.md) guide for pointers on how to contribute to `panchangtao` and `wagon`.

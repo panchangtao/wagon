@@ -1,4 +1,4 @@
-// Copyright 2017 The go-interpreter Authors.  All rights reserved.
+// Copyright 2017 The panchangtao Authors.  All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -11,10 +11,10 @@ import (
 	"fmt"
 	"math"
 
-	"github.com/go-interpreter/wagon/disasm"
-	"github.com/go-interpreter/wagon/exec/internal/compile"
-	"github.com/go-interpreter/wagon/wasm"
-	ops "github.com/go-interpreter/wagon/wasm/operators"
+	"github.com/panchangtao/wagon/disasm"
+	"github.com/panchangtao/wagon/exec/internal/compile"
+	"github.com/panchangtao/wagon/wasm"
+	ops "github.com/panchangtao/wagon/wasm/operators"
 )
 
 var (

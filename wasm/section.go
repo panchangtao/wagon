@@ -1,4 +1,4 @@
-// Copyright 2017 The go-interpreter Authors.  All rights reserved.
+// Copyright 2017 The panchangtao Authors.  All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -11,8 +11,8 @@ import (
 	"io"
 	"io/ioutil"
 
-	"github.com/go-interpreter/wagon/wasm/internal/readpos"
-	"github.com/go-interpreter/wagon/wasm/leb128"
+	"github.com/panchangtao/wagon/wasm/internal/readpos"
+	"github.com/panchangtao/wagon/wasm/leb128"
 )
 
 // SectionID is a 1-byte code that encodes the section code of both known and custom sections.
