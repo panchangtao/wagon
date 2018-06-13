@@ -6,7 +6,6 @@ package exec
 
 import (
 	"errors"
-	"fmt"
 )
 
 var (
@@ -22,17 +21,18 @@ var (
 
 func (vm *VM) call() {
 	index := vm.fetchUint32()
-	fun, ok := vm.funcs[index].(compiledFunction)
+	/*fun, ok := vm.funcs[index].(compiledFunction)
 	if ok {
 		if fun.IsEnv {
 			if fun.Name == "Println" {
 				fmt.Println("Println Call log aba")
-				vm.popUint64()
+				data := vm.module.Data.Entries[0].Data
 				vm.pushUint64(0)
+				fmt.Println(string(data))
 				return
 			}
 		}
-	}
+	}*/
 	vm.funcs[index].call(vm, int64(index))
 }
 

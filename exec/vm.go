@@ -281,6 +281,11 @@ func (vm *VM) ExecCode(fnIndex int64, args ...uint64) (rtrn interface{}, err err
 	if int(fnIndex) > len(vm.funcs) {
 		return nil, InvalidFunctionIndexError(fnIndex)
 	}
+	if len(vm.module.GetFunction(int(fnIndex)).Sig.ParamTypes) != 0{
+		args = make([]uint64, 1)
+		args[0] = uint64(fnIndex)
+	}
+	fmt.Println("len(vm.module.GetFunction(int(fnIndex)).Sig.ParamTypes):", len(vm.module.GetFunction(int(fnIndex)).Sig.ParamTypes), "len(args):", len(args))
 	if len(vm.module.GetFunction(int(fnIndex)).Sig.ParamTypes) != len(args) {
 		return nil, ErrInvalidArgumentCount
 	}
@@ -291,6 +296,7 @@ func (vm *VM) ExecCode(fnIndex int64, args ...uint64) (rtrn interface{}, err err
 	if len(vm.ctx.stack) < compiled.maxDepth {
 		vm.ctx.stack = make([]uint64, 0, compiled.maxDepth)
 	}
+	fmt.Println("compiled.totalLocalVars:", compiled.totalLocalVars)
 	vm.ctx.locals = make([]uint64, compiled.totalLocalVars)
 	vm.ctx.pc = 0
 	vm.ctx.code = compiled.code

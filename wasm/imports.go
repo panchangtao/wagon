@@ -7,6 +7,7 @@ package wasm
 import (
 	"errors"
 	"fmt"
+	"reflect"
 )
 
 // Import is an intreface implemented by types that can be imported by a WebAssembly module.
@@ -102,10 +103,12 @@ func (module *Module) resolveImports(resolve ResolveFunc) error {
 			if importEntry.Kind == ExternalFunction {
 				//get the function type
 				funcType := module.Types.Entries[importEntry.Type.(FuncImport).Type]
-				var code []byte
-				code = append(code, 0x41)
-				code = append(code, 0x0b)
-				fn := &Function{IsEnv: true, Name: importEntry.FieldName, Sig: &FunctionSig{ParamTypes: funcType.ParamTypes, ReturnTypes: funcType.ReturnTypes}, Body: &FunctionBody{Code:code}}
+				//var code = []byte{0x41, 0x0b}
+				fn := &Function{
+					Sig:   &FunctionSig{ParamTypes: funcType.ParamTypes, ReturnTypes: funcType.ReturnTypes},
+					Body:  &FunctionBody{},
+					Host:  reflect.ValueOf(abaAdd),
+				}
 				module.FunctionIndexSpace = append(module.FunctionIndexSpace, *fn)
 				module.Code.Bodies = append(module.Code.Bodies, *fn.Body)
 				module.imports.Funcs = append(module.imports.Funcs, funcs)
@@ -182,4 +185,8 @@ func (module *Module) resolveImports(resolve ResolveFunc) error {
 		}
 	}
 	return nil
+}
+
+func abaAdd() {
+	fmt.Println("abaAdd")
 }

@@ -63,6 +63,7 @@ func main() {
 		i := int64(e.Index)
 		fidx := m.Function.Types[int(i)]
 		ftype := m.Types.Entries[int(fidx)]
+		//data := m.Data.Entries[int(i)].Data
 		switch len(ftype.ReturnTypes) {
 		case 1:
 			fmt.Printf("%s() %s => ", name, ftype.ReturnTypes[0])
@@ -76,6 +77,7 @@ func main() {
 			log.Printf("running exported functions with input parameters is not supported")
 			continue
 		}
+
 		o, err := vm.ExecCode(i)
 		if err != nil {
 			fmt.Printf("\n")
