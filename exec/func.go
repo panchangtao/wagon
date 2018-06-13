@@ -23,8 +23,6 @@ type compiledFunction struct {
 	totalLocalVars int    // number of local variables used by the function
 	args           int    // number of arguments the function accepts
 	returns        bool   // whether the function returns a value
-	IsEnv          bool   //add for envfunc
-	Name           string //method name to call
 }
 
 type goFunction struct {

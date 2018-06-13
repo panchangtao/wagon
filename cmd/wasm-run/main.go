@@ -13,6 +13,7 @@ import (
 	"github.com/panchangtao/wagon/exec"
 	"github.com/panchangtao/wagon/validate"
 	"github.com/panchangtao/wagon/wasm"
+	"reflect"
 )
 
 func main() {
@@ -38,7 +39,7 @@ func main() {
 	}
 	defer f.Close()
 
-	m, err := wasm.ReadModule(f, importer)
+	m, err := wasm.ReadModule(f, mimporter)
 	if err != nil {
 		log.Fatalf("could not read module: %v", err)
 	}
@@ -60,6 +61,9 @@ func main() {
 	}
 
 	for name, e := range m.Export.Entries {
+		if e.Kind != 0 {
+			continue
+		}
 		i := int64(e.Index)
 		fidx := m.Function.Types[int(i)]
 		ftype := m.Types.Entries[int(fidx)]
@@ -105,5 +109,43 @@ func importer(name string) (*wasm.Module, error) {
 	if err != nil {
 		return nil, err
 	}
+	return m, nil
+}
+
+func add3(x int32) int32 {
+	return x + 3
+}
+
+func mimporter(name string) (*wasm.Module, error) {
+	fmt.Println("import name:", name)
+	m := wasm.NewModule()
+	m.Types = &wasm.SectionTypes{
+		// List of all function types available in this module.
+		// There is only one: (func [int32] -> [int32])
+		Entries: []wasm.FunctionSig{
+			{
+				Form:        0,
+				ParamTypes:  []wasm.ValueType{wasm.ValueTypeI32},
+				ReturnTypes: []wasm.ValueType{wasm.ValueTypeI32},
+			},
+		},
+	}
+	m.FunctionIndexSpace = []wasm.Function{
+		{
+			Sig:  &m.Types.Entries[0],
+			Host: reflect.ValueOf(add3),
+			Body: &wasm.FunctionBody{},
+		},
+	}
+	m.Export = &wasm.SectionExports{
+		Entries: map[string]wasm.ExportEntry{
+			"add3": {
+				FieldStr: "add3",
+				Kind:     wasm.ExternalFunction,
+				Index:    0,
+			},
+		},
+	}
+
 	return m, nil
 }

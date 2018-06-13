@@ -21,8 +21,6 @@ const (
 
 // Function represents an entry in the function index space of a module.
 type Function struct {
-	IsEnv bool
-	Name string
 	Sig  *FunctionSig
 	Body *FunctionBody
 	Host reflect.Value

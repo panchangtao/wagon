@@ -127,8 +127,6 @@ func NewVM(module *wasm.Module) (*VM, error) {
 			totalLocalVars: totalLocalVars,
 			args:           len(fn.Sig.ParamTypes),
 			returns:        len(fn.Sig.ReturnTypes) != 0,
-			IsEnv:          fn.IsEnv,
-			Name:           fn.Name,
 		}
 	}
 
