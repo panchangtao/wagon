@@ -39,7 +39,7 @@ func main() {
 	}
 	defer f.Close()
 
-	m, err := wasm.ReadModule(f, mimporter)
+	m, err := wasm.ReadModule(f, mImporter)
 	if err != nil {
 		log.Fatalf("could not read module: %v", err)
 	}
@@ -113,16 +113,36 @@ func importer(name string) (*wasm.Module, error) {
 }
 
 func add3(x int32) int32 {
+	fmt.Println("add3 call")
 	return x + 3
 }
+func add5(x int32) int32 {
+	fmt.Println("add5 call")
+	return x + 5
+}
 
-func mimporter(name string) (*wasm.Module, error) {
+func Println(p int32){
+	fmt.Println("Println call")
+	fmt.Println(p)
+}
+
+func mImporter(name string) (*wasm.Module, error) {
 	fmt.Println("import name:", name)
 	m := wasm.NewModule()
 	m.Types = &wasm.SectionTypes{
 		// List of all function types available in this module.
 		// There is only one: (func [int32] -> [int32])
 		Entries: []wasm.FunctionSig{
+			{
+				Form:        0,
+				ParamTypes:  []wasm.ValueType{wasm.ValueTypeI32},
+				ReturnTypes: []wasm.ValueType{wasm.ValueTypeI32},
+			},
+			{
+				Form:        0,
+				ParamTypes:  []wasm.ValueType{wasm.ValueTypeI32},
+				ReturnTypes: []wasm.ValueType{wasm.ValueTypeI32},
+			},
 			{
 				Form:        0,
 				ParamTypes:  []wasm.ValueType{wasm.ValueTypeI32},
@@ -136,6 +156,16 @@ func mimporter(name string) (*wasm.Module, error) {
 			Host: reflect.ValueOf(add3),
 			Body: &wasm.FunctionBody{},
 		},
+		{
+			Sig:  &m.Types.Entries[1],
+			Host: reflect.ValueOf(add5),
+			Body: &wasm.FunctionBody{},
+		},
+		{
+			Sig:  &m.Types.Entries[2],
+			Host: reflect.ValueOf(Println),
+			Body: &wasm.FunctionBody{},
+		},
 	}
 	m.Export = &wasm.SectionExports{
 		Entries: map[string]wasm.ExportEntry{
@@ -144,8 +174,19 @@ func mimporter(name string) (*wasm.Module, error) {
 				Kind:     wasm.ExternalFunction,
 				Index:    0,
 			},
+			"add5": {
+				FieldStr: "add5",
+				Kind:     wasm.ExternalFunction,
+				Index:    1,
+			},
+			"Println": {
+				FieldStr: "Println",
+				Kind:     wasm.ExternalFunction,
+				Index:    2,
+			},
 		},
 	}
 
 	return m, nil
 }
+
