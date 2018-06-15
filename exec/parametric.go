@@ -5,7 +5,9 @@
 package exec
 
 func (vm *VM) drop() {
-	vm.ctx.stack = vm.ctx.stack[:len(vm.ctx.stack)-1]
+	if len(vm.ctx.stack) > 1{
+		vm.ctx.stack = vm.ctx.stack[:len(vm.ctx.stack)-1]
+	}
 }
 
 func (vm *VM) selectOp() {

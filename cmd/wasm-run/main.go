@@ -59,7 +59,22 @@ func main() {
 	if err != nil {
 		log.Fatalf("could not create VM: %v", err)
 	}
+	entry, ok := m.Export.Entries["main"]
 
+	if ok == false {
+		fmt.Printf("method does not exist!")
+	}
+	index := int64(entry.Index)
+	//fIdx := m.Function.Types[int(index)]
+	//fType := m.Types.Entries[int(fIdx)]
+
+	res, err := vm.ExecCode(index)
+	if err != nil {
+		fmt.Printf("err=%v", err)
+	}
+	fmt.Printf("res:%[1]v (%[1]T)\n", res)
+
+/*
 	for name, e := range m.Export.Entries {
 		if e.Kind != 0 {
 			continue
@@ -93,6 +108,7 @@ func main() {
 		}
 		fmt.Printf("%[1]v (%[1]T)\n", o)
 	}
+*/
 }
 
 func importer(name string) (*wasm.Module, error) {
@@ -121,9 +137,9 @@ func add5(x int32) int32 {
 	return x + 5
 }
 
-func Println(p int32){
+func ABA_Log(str string){
 	fmt.Println("Println call")
-	fmt.Println(p)
+	fmt.Println(str)
 }
 
 func mImporter(name string) (*wasm.Module, error) {
@@ -163,7 +179,7 @@ func mImporter(name string) (*wasm.Module, error) {
 		},
 		{
 			Sig:  &m.Types.Entries[2],
-			Host: reflect.ValueOf(Println),
+			Host: reflect.ValueOf(ABA_Log),
 			Body: &wasm.FunctionBody{},
 		},
 	}
@@ -179,8 +195,8 @@ func mImporter(name string) (*wasm.Module, error) {
 				Kind:     wasm.ExternalFunction,
 				Index:    1,
 			},
-			"Println": {
-				FieldStr: "Println",
+			"ABA_Log": {
+				FieldStr: "ABA_Log",
 				Kind:     wasm.ExternalFunction,
 				Index:    2,
 			},
